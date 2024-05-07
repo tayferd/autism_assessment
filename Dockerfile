@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install system dependencies for matplotlib
+# Install system dependencies for matplotlib and other potential dependencies
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     pkg-config \
@@ -20,8 +20,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Define environment variable to specify the Python file containing the Flask instance
+# Environment variables
 ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
 
-# Use Gunicorn to run the Flask app; adjust the number of workers as needed
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+# Initialize database and start the application with Gunicorn
+CMD ["sh", "-c", "python -c 'from app import db; db.create_all()' && gunicorn -w 4 -b :5000 app:app"]
