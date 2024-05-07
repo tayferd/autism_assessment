@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 # Predefined set of questions
 QUESTIONS = [
@@ -33,10 +37,6 @@ QUESTIONS = [
 ]
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
 class ChildAssessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +63,8 @@ class ChildAssessment(db.Model):
     clothing_textures_intolerance = db.Column(db.Integer, nullable=False)  # New field
     seeks_sensory_experiences = db.Column(db.Integer, nullable=False)  # New field
 
-
+def initialize_database():
+    db.create_all()
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -327,9 +328,12 @@ def get_assessment(assessment_id):
 
 
 
+# At the end of your app.py
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # Create database tables within the application context
-    app.run(debug=True)
+    from app import db  # Importing db from the same file if db is defined in app.py
+    db.create_all()  # Create the database tables
+    app.run(debug=True, host='0.0.0.0')  # Run the Flask development server
+
+
 
