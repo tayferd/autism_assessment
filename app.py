@@ -331,9 +331,8 @@ def get_assessment(assessment_id):
 # At the end of your app.py
 
 if __name__ == "__main__":
-    from app import db  # Importing db from the same file if db is defined in app.py
-    db.create_all()  # Create the database tables
-    app.run(debug=True, host='0.0.0.0')  # Run the Flask development server
+ 
+    app.run(debug=False, host='0.0.0.0', port=80)  # Run the Flask development server
 
 
 
